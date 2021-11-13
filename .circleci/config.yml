@@ -4,53 +4,6 @@ orbs:
   aws-cli: circleci/aws-cli@0.1.16
 
 jobs:
-  docker-job:
-    docker:
-      - image: circleci/node:12
-      - image: localstack/localstack:0.10.5
-        environment:
-          DEBUG: 1
-          SERVICES: s3,iam,lambda
-
-    environment:
-      AWS_DEFAULT_REGION: us-east-1
-      AWS_SECRET_ACCESS_KEY: foo
-      AWS_ACCESS_KEY_ID: bar
-
-    steps:
-      - checkout
-
-      - aws-cli/install
-
-      - aws-cli/setup
-
-      - install_terraform
-
-      - run: env
-
-      - run:
-          name: Wait for localstack ports
-          command: ./wait-for-localstack-ports.sh
-
-      - run:
-          name: aws stuff
-          command: |
-            aws --version
-            aws --endpoint-url=http://localhost:4572 s3 mb s3://local-bucket
-            aws --endpoint-url=http://localhost:4572 s3 ls
-
-      - run:
-          name: terraform
-          command: |
-            terraform init -input=false
-            terraform apply -auto-approve -input=false
-
-      - run:
-          name: lambda
-          command: |
-            aws --endpoint-url=http://localhost:4574 lambda list-functions
-          # *invoking* the lambda requires configuring LocalStack with LAMBDA_EXECUTOR=docker ,
-          # which runs docker-in-docker and doesn't work trivially in Circle.
 
   machine-job:
     machine:
@@ -124,5 +77,4 @@ workflows:
   version: 2
   jobs:
     jobs:
-      - docker-job
       - machine-job
