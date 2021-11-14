@@ -6,8 +6,8 @@ orbs:
 jobs:
 
   machine-job:
-    machine:
-      image: ubuntu-1604:201903-01
+    docker:
+      - image: cimg/base:2021.04
 
     environment:
       AWS_DEFAULT_REGION: us-east-1
